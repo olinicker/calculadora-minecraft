@@ -42,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
     private String expressao = "";
 
 
+    private Boolean contaPorcentagem = false;
+
+
     private Button buttonIgual;
     private Button buttonReset;
     private Button buttonD;
@@ -285,13 +288,33 @@ public class MainActivity extends AppCompatActivity {
                 try {
 
                     avaliadorExpressao = new ExpressionBuilder(expressao).build();
-
                     expressaoAnterior = expressao;
-                    Double resultado = avaliadorExpressao.calculate();
-                    expressao = resultado.toString();
 
-                    textViewUltimaExpressao.setText(expressaoAnterior);
-                    textViewResultado.setText(resultado.toString());
+                    if(expressao.contains("%")){
+                        contaPorcentagem = true;
+                    }
+
+                    if(contaPorcentagem){
+                       String[] partes = expressao.split("%");
+                       Double[] numeros = new Double[2];
+                       numeros[0] = Double.parseDouble(partes[0]);
+                       numeros[1] = Double.parseDouble(partes[1]);
+
+                       double resultadoPorcentagem = (numeros[0] / 100) * numeros[1];
+                       expressao =String.valueOf(resultadoPorcentagem);
+                       textViewUltimaExpressao.setText(expressaoAnterior);
+                       textViewResultado.setText(String.valueOf(resultadoPorcentagem));
+
+                        contaPorcentagem = false;
+
+                    }else{
+                        Double resultado = avaliadorExpressao.calculate();
+                        expressao = resultado.toString();
+                        textViewUltimaExpressao.setText(expressaoAnterior);
+                        textViewResultado.setText(resultado.toString());
+                    }
+
+
                 } catch (Exception e) {
                     Toast.makeText(MainActivity.this, "Expressão inválida", Toast.LENGTH_SHORT).show();
                     expressao = "0";
